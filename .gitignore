@@ -1,0 +1,10 @@
+# Nhost local development (never commit)
+.nhost/
+.secrets
+
+# Functions
+functions/node_modules/
+functions/dist/
+
+# OS
+.DS_Store
