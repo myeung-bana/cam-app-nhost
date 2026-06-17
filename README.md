@@ -70,7 +70,7 @@ These match `cam-app-admin/lib/nhost.ts`, which builds the Hasura URL as:
 ```text
 cam-app-nhost/
 ├── nhost/
-│   ├── nhost.toml          # Project config (Node 22, HS256 JWT, auth)
+│   ├── nhost.toml          # Project config (Node 22, RS256 JWT, auth)
 │   ├── config.yaml         # Hasura metadata v3 pointer
 │   ├── migrations/         # SQL migrations
 │   └── emails/             # Auth email templates

@@ -29,8 +29,8 @@ export async function requireAuth(
   }
 
   try {
-    const payload = jwt.verify(token, env.jwtSecret, {
-      algorithms: ["HS256"],
+    const payload = jwt.verify(token, env.jwtPublicKey, {
+      algorithms: ["RS256"],
     }) as JwtPayload;
     return payload;
   } catch {

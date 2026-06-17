@@ -5,21 +5,6 @@ function required(name: string, value: string | undefined): string {
   return value;
 }
 
-function parseJwtSecret(raw: string | undefined): string {
-  if (!raw) {
-    throw new Error("Missing required environment variable: NHOST_JWT_SECRET");
-  }
-
-  try {
-    const parsed = JSON.parse(raw) as { key?: string };
-    if (parsed.key) return parsed.key;
-  } catch {
-    // Fall through — treat as raw HS256 secret string.
-  }
-
-  return raw;
-}
-
 export const env = {
   get adminSecret(): string {
     return (
@@ -29,9 +14,11 @@ export const env = {
     );
   },
 
-  get jwtSecret(): string {
-    return parseJwtSecret(
-      process.env.NHOST_JWT_SECRET ?? process.env.HASURA_GRAPHQL_JWT_SECRET
+  /** RS256 public key — matches Nhost cloud default JWT setup. */
+  get jwtPublicKey(): string {
+    return required(
+      "NHOST_JWT_PUBLIC_KEY",
+      process.env.NHOST_JWT_PUBLIC_KEY
     );
   },
 
