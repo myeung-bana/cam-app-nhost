@@ -82,7 +82,7 @@ cam-app-nhost/
 └── .secrets                # Local only — gitignored
 ```
 
-Function conventions follow [`documentation/AI_rules.md`](../documentation/AI_rules.md).
+Function conventions follow [`AI_rules_v2.md`](../AI_rules_v2.md) (§15 Nhost Functions).
 
 ## Useful commands
 
