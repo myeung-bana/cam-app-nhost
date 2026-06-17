@@ -38,6 +38,22 @@ export const env = {
     );
   },
 
+  get authUrl(): string {
+    if (process.env.NHOST_AUTH_URL) {
+      return process.env.NHOST_AUTH_URL.replace(/\/$/, "");
+    }
+
+    const subdomain = process.env.NHOST_SUBDOMAIN;
+    const region = process.env.NHOST_REGION;
+    if (subdomain && region) {
+      return `https://${subdomain}.auth.${region}.nhost.run/v1`;
+    }
+
+    throw new Error(
+      "Missing Auth URL — set NHOST_AUTH_URL or NHOST_SUBDOMAIN + NHOST_REGION"
+    );
+  },
+
   get adminApiSecret(): string | undefined {
     return process.env.ADMIN_SECRET;
   },

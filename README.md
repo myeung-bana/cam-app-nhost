@@ -55,13 +55,16 @@ NEXT_PUBLIC_DEV_MODE=false
 NHOST_SUBDOMAIN=iowltpcolwnlrqfsrjtp
 NHOST_REGION=ap-southeast-1
 NHOST_ADMIN_SECRET=<from-dashboard>
+NHOST_FUNCTIONS_URL=https://iowltpcolwnlrqfsrjtp.functions.ap-southeast-1.nhost.run/v1
 
 NEXT_PUBLIC_NHOST_SUBDOMAIN=iowltpcolwnlrqfsrjtp
 NEXT_PUBLIC_NHOST_REGION=ap-southeast-1
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-These match `cam-app-admin/lib/nhost.ts`, which builds the Hasura URL as:
+Auth is headless: `cam-app-admin` calls `/v1/auth/*` functions (via its `/api/auth/*` BFF), not Nhost Auth SDK directly.
+
+Hasura GraphQL URL pattern:
 
 `https://${NHOST_SUBDOMAIN}.hasura.${NHOST_REGION}.nhost.run/v1/graphql`
 
@@ -77,7 +80,12 @@ cam-app-nhost/
 ├── functions/
 │   ├── _lib/               # Shared helpers (env, auth, hasura, respond)
 │   ├── health.ts           # GET /v1/health
-│   └── echo.ts             # POST /v1/echo (auth smoke test)
+│   ├── echo.ts             # POST /v1/echo (auth smoke test)
+│   └── auth/
+│       ├── sign-in.ts      # POST /v1/auth/sign-in
+│       ├── sign-out.ts     # POST /v1/auth/sign-out
+│       ├── refresh.ts      # POST /v1/auth/refresh
+│       └── session.ts      # GET /v1/auth/session
 ├── .secrets.example
 └── .secrets                # Local only — gitignored
 ```
