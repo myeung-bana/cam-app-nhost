@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-
-export const ADMIN_ROLE = "admin";
+import type { JwtPayload } from "./auth";
+import { ADMIN_ROLE, CLIENT_ROLE, GUEST_ROLE } from "./constants";
 
 interface HasuraJwtClaims {
   "https://hasura.io/jwt/claims"?: {
@@ -29,27 +29,53 @@ function normalizeAllowedRoles(
   return [allowed];
 }
 
-export function isAdminUser(
+function hasRole(
+  role: string,
   user?: AuthUserLike | null,
   accessToken?: string | null
 ): boolean {
-  if (user?.defaultRole === ADMIN_ROLE) return true;
-  if (user?.roles?.includes(ADMIN_ROLE)) return true;
+  if (user?.defaultRole === role) return true;
+  if (user?.roles?.includes(role)) return true;
 
   if (!accessToken) return false;
 
   try {
     const decoded = jwt.decode(accessToken) as HasuraJwtClaims | null;
     if (!decoded) return false;
-
     const claims = decoded["https://hasura.io/jwt/claims"];
     const defaultRole = claims?.["x-hasura-default-role"];
     const allowedRoles = normalizeAllowedRoles(
       claims?.["x-hasura-allowed-roles"]
     );
-
-    return defaultRole === ADMIN_ROLE || allowedRoles.includes(ADMIN_ROLE);
+    return defaultRole === role || allowedRoles.includes(role);
   } catch {
     return false;
   }
+}
+
+export function isAdminUser(
+  user?: AuthUserLike | null,
+  accessToken?: string | null
+): boolean {
+  return hasRole(ADMIN_ROLE, user, accessToken);
+}
+
+export function isClientUser(
+  user?: AuthUserLike | null,
+  accessToken?: string | null
+): boolean {
+  return hasRole(CLIENT_ROLE, user, accessToken);
+}
+
+export function isGuestUser(
+  user?: AuthUserLike | null,
+  accessToken?: string | null
+): boolean {
+  return hasRole(GUEST_ROLE, user, accessToken);
+}
+
+export function getDefaultRole(payload: JwtPayload): string | null {
+  return (
+    payload["https://hasura.io/jwt/claims"]?.["x-hasura-default-role"] ?? null
+  );
 }

@@ -9,6 +9,7 @@ export interface JwtPayload {
     "x-hasura-default-role"?: string;
     "x-hasura-allowed-roles"?: string[];
     "x-hasura-user-id"?: string;
+    [key: string]: string | string[] | undefined;
   };
 }
 

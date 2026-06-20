@@ -49,7 +49,7 @@ disableAutoSignup = false
 [auth.user]
 [auth.user.roles]
 default = 'user'
-allowed = ['user', 'me', 'admin']
+allowed = ['user', 'me', 'admin', 'client', 'guest']
 
 [auth.user.locale]
 default = 'en'
@@ -73,7 +73,7 @@ expiresIn = 2592000
 
 [auth.method]
 [auth.method.anonymous]
-enabled = false
+enabled = true
 
 [auth.method.emailPasswordless]
 enabled = false

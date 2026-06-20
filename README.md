@@ -62,7 +62,14 @@ NEXT_PUBLIC_NHOST_REGION=ap-southeast-1
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-Auth is headless: `cam-app-admin` calls `/v1/auth/*` functions (via its `/api/auth/*` BFF), not Nhost Auth SDK directly.
+Auth is headless: `cam-app-admin` calls `/v1/admin/auth/*` functions (via its `/api/auth/*` BFF), not Nhost Auth SDK directly.
+
+Guest join URLs use `{GUEST_APP_URL}/j/{join_code}`. Set `GUEST_APP_URL` in `.secrets` for functions (QR generation).
+
+```env
+GUEST_APP_URL=http://localhost:3001
+NEXT_PUBLIC_GUEST_APP_URL=http://localhost:3001
+```
 
 Hasura GraphQL URL pattern:
 
@@ -78,14 +85,13 @@ cam-app-nhost/
 │   ├── migrations/         # SQL migrations
 │   └── emails/             # Auth email templates
 ├── functions/
-│   ├── _lib/               # Shared helpers (env, auth, hasura, respond)
+│   ├── _lib/               # Shared helpers (env, auth, hasura-admin/user, guards)
 │   ├── health.ts           # GET /v1/health
-│   ├── echo.ts             # POST /v1/echo (auth smoke test)
-│   └── auth/
-│       ├── sign-in.ts      # POST /v1/auth/sign-in
-│       ├── sign-out.ts     # POST /v1/auth/sign-out
-│       ├── refresh.ts      # POST /v1/auth/refresh
-│       └── session.ts      # GET /v1/auth/session
+│   ├── admin/
+│   │   ├── auth/           # sign-in, sign-out, refresh, session
+│   │   └── events/         # get-qr, rotate-join-code
+│   └── guest/
+│       └── join/           # resolve, enter (dynamic QR)
 ├── .secrets.example
 └── .secrets                # Local only — gitignored
 ```

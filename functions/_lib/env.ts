@@ -57,4 +57,20 @@ export const env = {
   get adminApiSecret(): string | undefined {
     return process.env.ADMIN_SECRET;
   },
+
+  get guestAppUrl(): string {
+    return (
+      process.env.GUEST_APP_URL ??
+      process.env.NEXT_PUBLIC_GUEST_APP_URL ??
+      "http://localhost:3001"
+    ).replace(/\/$/, "");
+  },
+
+  get clientPortalUrl(): string {
+    return (
+      process.env.CLIENT_APP_URL ??
+      process.env.NEXT_PUBLIC_CLIENT_APP_URL ??
+      "http://localhost:3002"
+    ).replace(/\/$/, "");
+  },
 };

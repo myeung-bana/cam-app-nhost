@@ -1,9 +1,9 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { NhostAuthError, refreshAuthSession } from "../_lib/nhost-auth";
-import { isAdminUser } from "../_lib/roles";
-import { ok, fail } from "../_lib/respond";
-import { validate } from "../_lib/validate";
+import { NhostAuthError, refreshAuthSession } from "../../_lib/nhost-auth";
+import { isAdminUser } from "../../_lib/roles";
+import { ok, fail } from "../../_lib/respond";
+import { validate } from "../../_lib/validate";
 
 const RefreshSchema = z.object({
   refreshToken: z.string().min(1),
@@ -41,7 +41,7 @@ export default async function refresh(
       return;
     }
 
-    console.error("[auth/refresh]", error);
+    console.error("[admin/auth/refresh]", error);
     fail(res, "Internal server error", 500);
   }
 }

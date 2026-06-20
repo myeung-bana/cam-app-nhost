@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { NhostAuthError, signOutWithRefreshToken } from "../_lib/nhost-auth";
-import { ok, fail } from "../_lib/respond";
-import { validate } from "../_lib/validate";
+import { NhostAuthError, signOutWithRefreshToken } from "../../_lib/nhost-auth";
+import { ok, fail } from "../../_lib/respond";
+import { validate } from "../../_lib/validate";
 
 const SignOutSchema = z.object({
   refreshToken: z.string().min(1),
@@ -24,7 +24,7 @@ export default async function signOut(
       return;
     }
 
-    console.error("[auth/sign-out]", error);
+    console.error("[admin/auth/sign-out]", error);
     fail(res, "Internal server error", 500);
   }
 }

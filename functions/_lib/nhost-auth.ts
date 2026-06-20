@@ -149,3 +149,32 @@ export async function signOutWithRefreshToken(
     throw new NhostAuthError("Sign out failed", response.status);
   }
 }
+
+interface SignInAnonymousResponse {
+  session?: NhostSession;
+}
+
+export async function signInAnonymous(options?: {
+  displayName?: string;
+  eventId?: string;
+}): Promise<AuthSessionPayload> {
+  const response = await fetch(`${env.authUrl}/signin/anonymous`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      displayName: options?.displayName,
+      metadata: options?.eventId ? { eventId: options.eventId } : undefined,
+    }),
+  });
+
+  const body = await parseAuthResponse<SignInAnonymousResponse>(
+    response,
+    "Anonymous sign-in failed"
+  );
+
+  if (!body.session) {
+    throw new NhostAuthError("Anonymous sign-in failed", 500);
+  }
+
+  return mapSession(body.session);
+}

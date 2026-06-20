@@ -4,10 +4,10 @@ import {
   NhostAuthError,
   signInWithEmailPassword,
   signOutWithRefreshToken,
-} from "../_lib/nhost-auth";
-import { isAdminUser } from "../_lib/roles";
-import { ok, fail } from "../_lib/respond";
-import { validate } from "../_lib/validate";
+} from "../../_lib/nhost-auth";
+import { isAdminUser } from "../../_lib/roles";
+import { ok, fail } from "../../_lib/respond";
+import { validate } from "../../_lib/validate";
 
 const SignInSchema = z.object({
   email: z.string().email(),
@@ -52,7 +52,7 @@ export default async function signIn(
       return;
     }
 
-    console.error("[auth/sign-in]", error);
+    console.error("[admin/auth/sign-in]", error);
     fail(res, "Internal server error", 500);
   }
 }
