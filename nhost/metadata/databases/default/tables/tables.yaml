@@ -1,0 +1,13 @@
+!include public_event_types.yaml
+!include public_challenge_templates.yaml
+!include public_clients.yaml
+!include public_events.yaml
+!include public_guest_sessions.yaml
+!include public_challenges.yaml
+!include public_media.yaml
+!include public_challenge_completions.yaml
+!include public_milestones.yaml
+!include public_reels.yaml
+!include public_admin_users.yaml
+!include public_activity_log.yaml
+!include public_notifications.yaml
