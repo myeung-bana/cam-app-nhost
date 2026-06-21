@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import QRCode from "qrcode";
-import { requireAdmin } from "../../_lib/guards/require-admin";
+import { requireAdminAccess } from "../../_lib/guards/require-admin-access";
 import { fetchEventById } from "../../_lib/events-data";
 import { env } from "../../_lib/env";
 import { ok, fail } from "../../_lib/respond";
@@ -10,7 +10,7 @@ export default async function getQr(
   res: Response
 ): Promise<void> {
   try {
-    const auth = await requireAdmin(req, res);
+    const auth = await requireAdminAccess(req, res);
     if (!auth) return;
 
     const eventId = String(req.query.eventId ?? "");

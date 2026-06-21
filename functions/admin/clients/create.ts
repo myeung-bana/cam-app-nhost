@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { requireAdmin } from "../../_lib/guards/require-admin";
+import { requireAdminAccess } from "../../_lib/guards/require-admin-access";
 import {
   fetchClientByEmail,
   insertClient,
@@ -31,7 +31,7 @@ export default async function createClient(
   res: Response
 ): Promise<void> {
   try {
-    const auth = await requireAdmin(req, res);
+    const auth = await requireAdminAccess(req, res);
     if (!auth) return;
 
     const body = validate(req, res, CreateClientSchema);

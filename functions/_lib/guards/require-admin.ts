@@ -3,6 +3,7 @@ import { requireAuth, getUserId, type JwtPayload } from "../auth";
 import { isAdminUser } from "../roles";
 import { fail } from "../respond";
 
+/** JWT-only admin guard — for session probe and tools that must validate a user token. */
 export async function requireAdmin(
   req: Request,
   res: Response
