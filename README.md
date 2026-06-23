@@ -117,3 +117,12 @@ curl https://iowltpcolwnlrqfsrjtp.functions.ap-southeast-1.nhost.run/v1/health
 ```
 
 Expected: `{ "ok": true, "data": { "status": "ok", ... } }`
+
+## Guest PWA auth hook
+
+Configure in Nhost Dashboard → **Auth → Hooks → Custom access token**:
+
+- URL: `{FUNCTIONS_URL}/auth/access-token`
+- Maps anonymous user `metadata.eventId` → Hasura claim `x-hasura-event-id`
+
+Guest join also sets `defaultRole: guest` on anonymous sign-in (`functions/_lib/nhost-auth.ts`).

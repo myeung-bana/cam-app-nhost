@@ -1,0 +1,38 @@
+table:
+  name: clients
+  schema: public
+select_permissions:
+  - role: admin
+    permission:
+      columns: "*"
+      filter: {}
+      allow_aggregations: true
+  - role: client
+    permission:
+      columns: "*"
+      filter:
+        nhost_user_id:
+          _eq: X-Hasura-User-Id
+insert_permissions:
+  - role: admin
+    permission:
+      check: {}
+      columns: "*"
+update_permissions:
+  - role: admin
+    permission:
+      columns: "*"
+      filter: {}
+      check: null
+delete_permissions:
+  - role: admin
+    permission:
+      filter: {}
+array_relationships:
+  - name: events
+    using:
+      foreign_key_constraint_on:
+        column: client_id
+        table:
+          name: events
+          schema: public

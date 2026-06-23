@@ -2,10 +2,12 @@ import type { Request, Response } from "express";
 import { z } from "zod";
 import { requireAdminAccess } from "../../_lib/guards/require-admin-access";
 import {
-  fetchAdminUserByEmail,
-  insertAdminUser,
-  mapAdminUserRow,
-} from "../../_lib/crm-data";
+  buildAdminUserMetadata,
+  fetchAuthUserByEmail,
+  hasAdminRole,
+  mapAuthUserToAdminUser,
+  updateAuthUser,
+} from "../../_lib/auth-users-data";
 import { logActivity } from "../../_lib/activity-log";
 import {
   sendPasswordResetEmail,
@@ -42,8 +44,8 @@ export default async function createAdminUser(
     const body = validate(req, res, CreateAdminUserSchema);
     if (!body) return;
 
-    const existing = await fetchAdminUserByEmail(body.email);
-    if (existing) {
+    const existing = await fetchAuthUserByEmail(body.email);
+    if (existing && hasAdminRole(existing.roles)) {
       fail(res, "An admin user with this email already exists", 409);
       return;
     }
@@ -54,6 +56,16 @@ export default async function createAdminUser(
       defaultRole: "admin",
     });
 
+    const user = await updateAuthUser(authUser.id, {
+      displayName: body.name,
+      phoneNumber: body.phone ?? null,
+      metadata: buildAdminUserMetadata({
+        role: body.role ?? "admin",
+        phone: body.phone ?? null,
+        notes: body.notes ?? null,
+      }),
+    });
+
     let inviteSent = false;
     try {
       await sendPasswordResetEmail(body.email, getAdminSetupUrl());
@@ -62,23 +74,13 @@ export default async function createAdminUser(
       console.error("[admin/users/create] invite email failed", error);
     }
 
-    const user = await insertAdminUser({
-      name: body.name,
-      email: body.email,
-      role: body.role ?? "admin",
-      status: "active",
-      phone: body.phone ?? null,
-      notes: body.notes ?? null,
-      nhost_user_id: authUser.id,
-    });
-
     await logActivity({
       type: "admin_user_created",
-      label: `Admin user ${user.name} created`,
+      label: `Admin user ${user.displayName ?? body.name} created`,
       entity_ref: user.id,
     });
 
-    ok(res, { user: mapAdminUserRow(user), inviteSent }, 201);
+    ok(res, { user: mapAuthUserToAdminUser(user), inviteSent }, 201);
   } catch (error) {
     if (error instanceof NhostAuthError) {
       fail(res, error.message, error.status);

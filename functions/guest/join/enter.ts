@@ -12,6 +12,7 @@ import {
   insertGuestSession,
 } from "../../_lib/events-data";
 import { signInAnonymous, NhostAuthError } from "../../_lib/nhost-auth";
+import { handleCorsPreflight } from "../../_lib/cors";
 import { ok, fail } from "../../_lib/respond";
 import { validate } from "../../_lib/validate";
 
@@ -25,6 +26,8 @@ export default async function enter(
   req: Request,
   res: Response
 ): Promise<void> {
+  if (handleCorsPreflight(req, res)) return;
+
   try {
     const body = validate(req, res, EnterSchema);
     if (!body) return;

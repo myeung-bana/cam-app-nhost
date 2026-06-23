@@ -4,7 +4,7 @@ import type { EventRow } from "./entry-rules";
 
 const GET_EVENT_BY_JOIN_CODE = `
   query GetEventByJoinCode($joinCode: String!) {
-    events(where: { join_code: { _eq: $joinCode } }, limit: 1) {
+    events(where: { join_code: { _ilike: $joinCode } }, limit: 1) {
       id
       name
       event_type
@@ -150,6 +150,47 @@ export async function rotateEventJoinCode(eventId: string, joinCode: string) {
   }
 
   return result.data.update_events_by_pk;
+}
+
+const UPDATE_GUEST_SESSION_HEARTBEAT = `
+  mutation TouchGuestSession($id: uuid!, $eventId: uuid!, $userId: uuid!, $at: timestamptz!) {
+    update_guest_sessions(
+      where: {
+        id: { _eq: $id }
+        event_id: { _eq: $eventId }
+        nhost_user_id: { _eq: $userId }
+      }
+      _set: { last_heartbeat_at: $at }
+    ) {
+      returning {
+        id
+        last_heartbeat_at
+      }
+    }
+  }
+`;
+
+export async function touchGuestSessionHeartbeat(
+  guestSessionId: string,
+  eventId: string,
+  nhostUserId: string
+) {
+  const result = await hasuraAdminQuery<{
+    update_guest_sessions: {
+      returning: Array<{ id: string; last_heartbeat_at: string }>;
+    };
+  }>(UPDATE_GUEST_SESSION_HEARTBEAT, {
+    id: guestSessionId,
+    eventId,
+    userId: nhostUserId,
+    at: new Date().toISOString(),
+  });
+
+  if (result.errors?.length) {
+    throw new Error(result.errors[0]?.message ?? "Failed to update heartbeat");
+  }
+
+  return result.data?.update_guest_sessions.returning[0] ?? null;
 }
 
 export { logActivity } from "./activity-log";
