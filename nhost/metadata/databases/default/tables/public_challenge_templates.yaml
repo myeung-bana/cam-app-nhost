@@ -1,0 +1,24 @@
+table:
+  name: challenge_templates
+  schema: public
+select_permissions:
+  - role: admin
+    permission:
+      columns: "*"
+      filter: {}
+      allow_aggregations: true
+insert_permissions:
+  - role: admin
+    permission:
+      check: {}
+      columns: "*"
+update_permissions:
+  - role: admin
+    permission:
+      columns: "*"
+      filter: {}
+      check: null
+delete_permissions:
+  - role: admin
+    permission:
+      filter: {}

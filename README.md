@@ -82,6 +82,7 @@ cam-app-nhost/
 ├── nhost/
 │   ├── nhost.toml          # Project config (Node 22, RS256 JWT, auth)
 │   ├── config.yaml         # Hasura metadata v3 pointer
+│   ├── metadata/           # Hasura permissions (incl. guest role)
 │   ├── migrations/         # SQL migrations
 │   └── emails/             # Auth email templates
 ├── functions/
@@ -123,6 +124,33 @@ Expected: `{ "ok": true, "data": { "status": "ok", ... } }`
 Configure in Nhost Dashboard → **Auth → Hooks → Custom access token**:
 
 - URL: `{FUNCTIONS_URL}/auth/access-token`
-- Maps anonymous user `metadata.eventId` → Hasura claim `x-hasura-event-id`
+- Maps anonymous user `metadata.eventId` → Hasura claim `x-hasura-event-id` and `defaultRole: guest`
 
-Guest join also sets `defaultRole: guest` on anonymous sign-in (`functions/_lib/nhost-auth.ts`).
+Guests must **re-join** after enabling the hook so new JWTs include the guest role.
+
+## Hasura metadata
+
+Guest permissions live in `nhost/metadata/` (restored from git). Push to deploy. Key tables for the PWA:
+
+- `media` — guest `insert` scoped to `X-Hasura-Event-Id` + own session
+- `guest_sessions` — guest `select` / heartbeat `update`
+- `challenges`, `challenge_completions`, `milestones` — guest read / insert
+
+Apply with your normal Nhost deploy flow (`git push` or `nhost deployments new`).
+
+## Storage ACL (guest uploads)
+
+In Nhost Dashboard → **Storage** → bucket **`cam-bucket`** (must match `NEXT_PUBLIC_STORAGE_BUCKET`):
+
+Add rules so the **`guest`** role can **insert** and **select** files. Example policy shape:
+
+```json
+{
+  "insert": { "user": { "role": { "_eq": "guest" } } },
+  "select": { "user": { "role": { "_eq": "guest" } } }
+}
+```
+
+Without this, photo bytes upload fails with 403 even when Hasura permissions are correct.
+
+Guest join also sets `metadata.eventId` on anonymous sign-in (`functions/_lib/nhost-auth.ts`).
