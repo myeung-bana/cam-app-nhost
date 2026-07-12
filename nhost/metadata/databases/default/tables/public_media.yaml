@@ -1,0 +1,85 @@
+table:
+  name: media
+  schema: public
+object_relationships:
+  - name: guest_session
+    using:
+      foreign_key_constraint_on: session_id
+  - name: event
+    using:
+      foreign_key_constraint_on: event_id
+array_relationships: []
+select_permissions:
+  - role: admin
+    permission:
+      columns: "*"
+      filter: {}
+      allow_aggregations: true
+  - role: guest
+    permission:
+      columns:
+        - id
+        - event_id
+        - session_id
+        - file_url
+        - storage_file_id
+        - file_type
+        - filter_applied
+        - challenge_id
+        - uploaded_at
+        - is_hidden
+        - is_starred
+      filter:
+        guest_session:
+          nhost_user_id:
+            _eq: X-Hasura-User-Id
+      allow_aggregations: true
+insert_permissions:
+  - role: admin
+    permission:
+      check: {}
+      columns: "*"
+  - role: guest
+    permission:
+      check:
+        event_id:
+          _eq: X-Hasura-Event-Id
+        guest_session:
+          nhost_user_id:
+            _eq: X-Hasura-User-Id
+          event_id:
+            _eq: X-Hasura-Event-Id
+      columns:
+        - event_id
+        - session_id
+        - file_url
+        - storage_file_id
+        - file_type
+        - filter_applied
+        - challenge_id
+        - is_hidden
+        - is_starred
+update_permissions:
+  - role: admin
+    permission:
+      columns: "*"
+      filter: {}
+      check: null
+delete_permissions:
+  - role: admin
+    permission:
+      filter: {}
+event_triggers:
+  - name: media_bake_on_insert
+    definition:
+      enable_manual: false
+      insert:
+        columns: "*"
+    retry_conf:
+      interval_sec: 15
+      num_retries: 3
+      timeout_sec: 120
+    webhook: "{{NHOST_FUNCTIONS_URL}}/media/bake"
+    headers:
+      - name: x-hasura-admin-secret
+        value_from_env: NHOST_ADMIN_SECRET

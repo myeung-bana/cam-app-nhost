@@ -121,12 +121,22 @@ Expected: `{ "ok": true, "data": { "status": "ok", ... } }`
 
 ## Guest PWA auth hook
 
-Configure in Nhost Dashboard → **Auth → Hooks → Custom access token**:
+Configure in Nhost Dashboard → **Auth → Hooks → Custom access token** (if available):
 
 - URL: `{FUNCTIONS_URL}/auth/access-token`
 - Maps anonymous user `metadata.eventId` → Hasura claim `x-hasura-event-id` and `defaultRole: guest`
 
+Also configured in `nhost/nhost.toml`:
+
+```toml
+[[auth.session.accessToken.customClaims]]
+key = 'event-id'
+value = 'metadata.eventId'
+```
+
 Guests must **re-join** after enabling the hook so new JWTs include the guest role.
+
+The guest upload proxy (`POST /api/guest/upload`) falls back to admin session verification when JWT guest claims are missing, so uploads work even before the hook is live — provided `NHOST_ADMIN_SECRET` is set on the guest app.
 
 ## Hasura metadata
 

@@ -1,0 +1,49 @@
+table:
+  name: guest_sessions
+  schema: public
+object_relationships:
+  - name: event
+    using:
+      foreign_key_constraint_on: event_id
+select_permissions:
+  - role: admin
+    permission:
+      columns: "*"
+      filter: {}
+      allow_aggregations: true
+  - role: guest
+    permission:
+      columns:
+        - id
+        - event_id
+        - display_name
+        - joined_at
+        - last_heartbeat_at
+      filter:
+        nhost_user_id:
+          _eq: X-Hasura-User-Id
+insert_permissions:
+  - role: admin
+    permission:
+      check: {}
+      columns: "*"
+update_permissions:
+  - role: admin
+    permission:
+      columns: "*"
+      filter: {}
+      check: null
+  - role: guest
+    permission:
+      columns:
+        - last_heartbeat_at
+      filter:
+        nhost_user_id:
+          _eq: X-Hasura-User-Id
+        event_id:
+          _eq: X-Hasura-Event-Id
+      check: null
+delete_permissions:
+  - role: admin
+    permission:
+      filter: {}

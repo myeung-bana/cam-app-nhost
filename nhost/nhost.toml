@@ -68,6 +68,10 @@ rating = 'g'
 [auth.session.accessToken]
 expiresIn = 900
 
+[[auth.session.accessToken.customClaims]]
+key = 'event-id'
+value = 'metadata.eventId'
+
 [auth.session.refreshToken]
 expiresIn = 2592000
 

@@ -38,7 +38,11 @@ export default async function accessTokenHook(
       ? user.metadata
       : {};
   const eventId =
-    typeof metadata.eventId === "string" ? metadata.eventId : undefined;
+    typeof metadata.eventId === "string"
+      ? metadata.eventId
+      : typeof metadata.event_id === "string"
+        ? metadata.event_id
+        : undefined;
   const defaultRole =
     eventId && (user.defaultRole === "anonymous" || !user.defaultRole)
       ? "guest"
