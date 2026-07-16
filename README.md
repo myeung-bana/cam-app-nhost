@@ -145,22 +145,14 @@ Guest permissions live in `nhost/metadata/` (restored from git). Push to deploy.
 - `media` — guest `insert` scoped to `X-Hasura-Event-Id` + own session
 - `guest_sessions` — guest `select` / heartbeat `update`
 - `challenges`, `challenge_completions`, `milestones` — guest read / insert
+- `storage.buckets`, `storage.files` — **required** for Nhost Storage; exposes the `bucket` GraphQL field the storage service queries on upload
 
 Apply with your normal Nhost deploy flow (`git push` or `nhost deployments new`).
 
 ## Storage ACL (guest uploads)
 
-In Nhost Dashboard → **Storage** → bucket **`cam-bucket`** (must match `NEXT_PUBLIC_STORAGE_BUCKET`):
+Bucket **`cam-bucket`** is created by migration `1740000000001_create_cam_bucket` and must match `NEXT_PUBLIC_STORAGE_BUCKET` / `NHOST_STORAGE_BUCKET`.
 
-Add rules so the **`guest`** role can **insert** and **select** files. Example policy shape:
-
-```json
-{
-  "insert": { "user": { "role": { "_eq": "guest" } } },
-  "select": { "user": { "role": { "_eq": "guest" } } }
-}
-```
-
-Without this, photo bytes upload fails with 403 even when Hasura permissions are correct.
+Hasura permissions for guest file access are in `nhost/metadata/databases/default/tables/storage_files.yaml` (insert/select on `cam-bucket`). Server-side upload proxy uses the admin secret; gallery downloads use the guest JWT against `GET /v1/files/{id}`.
 
 Guest join also sets `metadata.eventId` on anonymous sign-in (`functions/_lib/nhost-auth.ts`).

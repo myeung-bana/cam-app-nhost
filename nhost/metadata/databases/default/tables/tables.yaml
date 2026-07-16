@@ -11,3 +11,5 @@
 - '!include public_admin_users.yaml'
 - '!include public_activity_log.yaml'
 - '!include public_notifications.yaml'
+- '!include storage_buckets.yaml'
+- '!include storage_files.yaml'
